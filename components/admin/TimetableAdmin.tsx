@@ -23,7 +23,17 @@ export default function TimetableAdmin({ courses, notify }: { courses: Course[];
 
   async function save() {
     if (!f.subject.trim()) return notify("اختر المادة أو اكتب اسمها.");
-    const payload = { semester: sem, section: sec, day: +f.day, start_time: f.start_time, end_time: f.end_time, subject: f.subject.trim(), room: f.room || null };
+    // نرسل room و hall معاً لضمان عدم حدوث أي خطأ في أي جدول قديم أو جديد
+    const payload = { 
+      semester: sem, 
+      section: sec, 
+      day: +f.day, 
+      start_time: f.start_time, 
+      end_time: f.end_time, 
+      subject: f.subject.trim(), 
+      room: f.room || null,
+      hall: f.room || null 
+    };
     const { error } = editId ? await sb.from("timetable").update(payload).eq("id", editId) : await sb.from("timetable").insert(payload);
     if (error) return notify("فشل الحفظ: " + error.message);
     notify(editId ? "تم التعديل" : "تمت الإضافة"); setF(empty); setEditId(null); load();
